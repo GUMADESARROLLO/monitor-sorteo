@@ -1,7 +1,7 @@
 FROM node:24.15.0-alpine AS build
 WORKDIR /app
 
-COPY package*.json .npmrc ./
+COPY package*.json ./
 RUN npm install
 
 COPY . .

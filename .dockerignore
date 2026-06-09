@@ -1,8 +1,5 @@
 node_modules/
-src/
 dist/
-.astro/
 .git
-.gitignore
 *.md
 .env
