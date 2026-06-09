@@ -1,0 +1,47 @@
+---
+import type { Draw } from '../lib/types'
+import { formatDate, formatPrize } from '../lib/formatters'
+
+interface Props {
+  draw: Draw
+  index: number
+}
+
+const { draw, index } = Astro.props
+---
+
+<div class="group relative bg-gradient-to-br from-gray-900/90 to-gray-950/90 border border-gray-800/60 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:border-amber-500/40 hover:-translate-y-1">
+  <div class="flex items-center justify-between mb-4">
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-semibold tracking-wide">
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-400" />
+      Sorteo #{draw.drawNumber}
+    </span>
+    <span class="text-[10px] text-gray-600 font-mono">{index === 0 ? 'ÚLTIMO' : index === 1 ? 'ANTERIOR' : `#${index + 1}`}</span>
+  </div>
+
+  <div class="text-center my-5">
+    <p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Billete Ganador</p>
+    <p class="font-mono text-3xl sm:text-4xl font-bold tracking-[0.2em] text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">
+      {draw.winnerNumber.split('').map(d => (
+        <span class="inline-block mx-0.5">{d}</span>
+      ))}
+    </p>
+  </div>
+
+  <div class="space-y-2 text-sm">
+    <div class="flex justify-between items-center py-1.5 border-t border-gray-800/50">
+      <span class="text-gray-400">Premio</span>
+      <span class="font-semibold text-amber-400">{formatPrize(draw.prize)}</span>
+    </div>
+    <div class="flex justify-between items-center py-1.5 border-t border-gray-800/50">
+      <span class="text-gray-400">Fecha</span>
+      <span class="text-gray-300">{formatDate(draw.date)}</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .group:hover .winner-digits {
+    text-shadow: 0 0 12px rgba(52, 211, 153, 0.5);
+  }
+</style>

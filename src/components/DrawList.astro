@@ -1,0 +1,28 @@
+---
+import type { Draw } from '../lib/types'
+import DrawCard from './DrawCard.astro'
+
+interface Props {
+  draws: Draw[]
+}
+
+const { draws } = Astro.props
+---
+
+{
+  draws.length > 0 ? (
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {draws.map((draw, i) => (
+        <div class="animate-fade-in" style={`animation-delay: ${i * 100}ms`}>
+          <DrawCard draw={draw} index={i} />
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div class="text-center py-20">
+      <p class="text-4xl mb-4">🏗️</p>
+      <p class="text-gray-400">No hay datos disponibles aún</p>
+      <p class="text-xs text-gray-600 mt-2">El scraper se ejecutará automáticamente en breve</p>
+    </div>
+  )
+}

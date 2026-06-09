@@ -1,0 +1,30 @@
+<button
+  id="refresh-btn"
+  class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white text-sm font-semibold shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:from-amber-500 hover:to-amber-400 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  <svg id="refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  </svg>
+  <span id="refresh-text">Forzar actualización</span>
+</button>
+
+<script>
+  const btn = document.getElementById('refresh-btn') as HTMLButtonElement | null
+  const icon = document.getElementById('refresh-icon') as SVGElement | null
+  const text = document.getElementById('refresh-text') as HTMLSpanElement | null
+
+  btn?.addEventListener('click', async () => {
+    if (!btn || !icon || !text) return
+    btn.disabled = true
+    text.textContent = 'Actualizando...'
+    icon.classList.add('animate-spin')
+    try {
+      await fetch('/api/refresh')
+      location.reload()
+    } catch {
+      text.textContent = 'Error — intenta de nuevo'
+      btn.disabled = false
+      icon.classList.remove('animate-spin')
+    }
+  })
+</script>

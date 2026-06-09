@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro'
+import DrawList from '../components/DrawList.astro'
+import RefreshButton from '../components/RefreshButton.astro'
+import { store } from '../lib/store'
+import { scrapeLastThreeDraws } from '../lib/scraper'
+import { startMonitor } from '../lib/monitor'
+
+startMonitor()
+
+export const prerender = false
+
+if (store.isEmpty()) {
+  try {
+    const draws = await scrapeLastThreeDraws()
+    store.update(draws)
+  } catch (err) {
+    console.error('[INDEX] Initial scrape failed:', err instanceof Error ? err.message : err)
+  }
+}
+
+const draws = store.getDraws()
+const updatedAt = store.getUpdatedAt()
+---
+
+<Layout>
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h2 class="text-2xl font-bold tracking-tight">Resultados recientes</h2>
+      <p class="text-sm text-gray-400 mt-1">
+        Últimos {draws.length > 0 ? draws.length : '—'} sorteos publicados
+        {updatedAt
+          ? ` — ${new Date(updatedAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`
+          : ''}
+      </p>
+    </div>
+    <RefreshButton />
+  </div>
+
+  <DrawList draws={draws} />
+</Layout>
+
+<style>
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out both;
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+import '../styles/global.css'
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monitor — Lotería Nacional</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎰</text></svg>" />
+  </head>
+  <body class="text-gray-100 font-sans antialiased">
+    <header class="border-b border-white/10 bg-black/30 backdrop-blur-sm">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🎰</span>
+          <div>
+            <h1 class="text-lg font-bold tracking-tight">Lotería Nacional</h1>
+            <p class="text-xs text-gray-400">Monitor de resultados</p>
+          </div>
+        </div>
+        <a
+          href="/api/draws"
+          target="_blank"
+          class="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+        >
+          API JSON →
+        </a>
+      </div>
+    </header>
+    <main class="max-w-6xl mx-auto px-4 py-8">
+      <slot />
+    </main>
+    <footer class="border-t border-white/5 text-center py-6 text-xs text-gray-600">
+      Datos obtenidos de <a href="https://www.loterianacional.com.ni/resultados/" target="_blank" class="underline hover:text-gray-400">loterianacional.com.ni</a>
+      &middot; Actualizado cada 15 minutos
+    </footer>
+  </body>
+</html>

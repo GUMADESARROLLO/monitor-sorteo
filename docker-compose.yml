@@ -1,0 +1,12 @@
+services:
+  monitor-loteria:
+    container_name: cn_monitor_loteria
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4321:4321"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=4321

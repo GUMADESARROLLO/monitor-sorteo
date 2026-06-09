@@ -1,0 +1,10 @@
+[33m[1m15:23:49[22m [WARN] [config][39m This project contains server-rendered routes, but no adapter is installed. This is fine for development, but an adapter will be required to build your site for production.
+[vite] connected.
+[2m15:23:50[22m [34m[types][39m Generated [2m1ms[22m
+[42m[1m astro [22m[49m [32mv6.4.5[39m [2mready in[22m 1696 [2mms[22m
+[2m┃[22m Local    [36mhttp://localhost:4321/[39m
+[2m┃[22m Network  [2muse --host to expose[22m
+[2m15:23:50[22m [32mwatching for file changes...[39m
+[33m▶ Vite [1m8.0.16[22m detected in your project.[39m
+  Astro requires Vite 7. Add [1m"overrides": { "vite": "^7" }[22m to your [1mpackage.json[22m to avoid issues.
+
