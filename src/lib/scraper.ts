@@ -2,7 +2,7 @@ import axios from 'axios'
 import * as cheerio from 'cheerio'
 import type { Draw } from './types'
 
-const TARGET_URL = 'https://www.loterianacional.com.ni/resultados/'
+const TARGET_URL = 'https://loterianacional.com.ni/resultados/'
 
 function parsePrize(raw: string): string {
   return raw.replace(/^C\$/, '').replace(/,/g, '').trim()
@@ -41,24 +41,29 @@ export async function scrapeLastThreeDraws(): Promise<Draw[]> {
 
   const draws: Draw[] = []
 
-  $('#tablepress-1 tbody tr').each((_, row) => {
-    const cells = $(row).find('td .mtr-cell-content')
-    if (cells.length < 4) return
+  $('.ls-card').each((_, card) => {
+    const drawNumberText = $(card).find('.ls-numero').text().replace(/\D/g, '')
 
-    const drawNumberText = $(cells[0]).text().trim()
-    const prizeRaw = $(cells[1]).text().trim()
-    const winnerNumber = $(cells[2]).text().trim()
-    const dateRaw = $(cells[4]).text().trim()
+    const fields: Record<string, string> = {}
+    $(card)
+      .find('.ls-info > div')
+      .each((_, line) => {
+        const label = $(line).find('b').text().replace(':', '').trim().toLowerCase()
+        const value = $(line).text().replace($(line).find('b').text(), '').trim()
+        if (label) fields[label] = value
+      })
 
+    const winnerNumber = fields['ganador']
     if (!drawNumberText || !winnerNumber) return
 
     draws.push({
       drawNumber: parseInt(drawNumberText, 10),
       winnerNumber,
-      prize: parsePrize(prizeRaw),
-      date: parseDate(dateRaw),
+      prize: parsePrize(fields['premio'] ?? ''),
+      date: parseDate(fields['fecha'] ?? ''),
     })
   })
 
+  draws.sort((a, b) => b.drawNumber - a.drawNumber)
   return draws.slice(0, 3)
 }
