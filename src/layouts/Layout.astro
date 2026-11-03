@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css'
+import BandWaves from '../components/BandWaves.astro'
 ---
 
 <!doctype html>
@@ -9,32 +10,65 @@ import '../styles/global.css'
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Monitor — Lotería Nacional</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎰</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body class="text-gray-100 font-sans antialiased">
-    <header class="border-b border-white/10 bg-black/30 backdrop-blur-sm">
-      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">🎰</span>
-          <div>
-            <h1 class="text-lg font-bold tracking-tight">Lotería Nacional</h1>
-            <p class="text-xs text-gray-400">Monitor de resultados</p>
-          </div>
-        </div>
-        <a
-          href="/api/draws"
-          target="_blank"
-          class="text-xs text-gray-500 hover:text-gray-300 transition-colors"
-        >
+  <body class="bg-paper text-ink font-body antialiased min-h-dvh flex flex-col overflow-x-hidden">
+    <header class="top-bar sticky top-0 z-20">
+      <div class="container-x flex items-center justify-between py-2.5">
+        <p class="m-0 flex items-baseline gap-3 min-w-0">
+          <b class="font-display font-extrabold text-lg leading-none uppercase tracking-[0.06em] text-royal">Monitor Lotería</b>
+          <span class="hidden sm:inline text-sm text-ink-soft truncate">Unimark 20 años · Supliendo salud</span>
+        </p>
+        <a href="/api/draws" target="_blank" class="text-xs font-bold uppercase tracking-[0.1em] text-ink-soft hover:text-royal transition-colors">
           API JSON →
         </a>
       </div>
     </header>
-    <main class="max-w-6xl mx-auto px-4 py-8">
-      <slot />
+
+    <main class="flex-1 flex flex-col">
+      <div class="container-x flex flex-wrap items-center justify-between gap-x-10 gap-y-2.5 pt-[clamp(14px,2.6vh,30px)]">
+        <div class="flex-[1_1_480px] min-w-0">
+          <h1 class="hero-title">Lotería Nacional</h1>
+          <p class="hero-slogan">Resultados y ganadores de los últimos sorteos</p>
+        </div>
+        <img
+          class="hero-logo max-sm:order-first max-sm:!h-[56px]"
+          src="/logo-unimark-20.webp"
+          alt="Unimark, 20 años. Supliendo salud"
+          width="1200"
+          height="364"
+          decoding="async"
+        />
+      </div>
+
+      <div class="band flex-1 flex flex-col">
+        <BandWaves />
+
+        <div class="container-x flex-1 pt-1 pb-[clamp(18px,3vh,36px)]">
+          <slot />
+        </div>
+
+        <footer class="border-t border-white/20">
+          <div class="container-x flex flex-wrap items-center justify-between gap-x-7 gap-y-2.5 pt-2 pb-1.5 text-[13px] text-on-royal-soft">
+            <p class="m-0"><strong class="text-white font-bold">Unimark</strong> · Supliendo salud desde hace 20 años</p>
+            <ul class="foot-links m-0 p-0 list-none flex flex-wrap gap-y-1.5">
+              <li>
+                Datos de <a href="https://loterianacional.com.ni/resultados/" target="_blank" class="text-white underline underline-offset-2">loterianacional.com.ni</a>
+              </li>
+              <li>Actualizado cada 15 minutos</li>
+            </ul>
+          </div>
+          <svg class="block w-full h-[18px]" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 34 C 400 30, 900 20, 1440 4" fill="none" stroke="#29b6e8" stroke-width="3"></path>
+            <path d="M200 40 C 600 34, 1000 26, 1440 14" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.85"></path>
+          </svg>
+        </footer>
+      </div>
     </main>
-    <footer class="border-t border-white/5 text-center py-6 text-xs text-gray-600">
-      Datos obtenidos de <a href="https://www.loterianacional.com.ni/resultados/" target="_blank" class="underline hover:text-gray-400">loterianacional.com.ni</a>
-      &middot; Actualizado cada 15 minutos
-    </footer>
   </body>
 </html>

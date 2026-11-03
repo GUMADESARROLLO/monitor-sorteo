@@ -1,28 +1,29 @@
 ---
-import type { Draw } from '../lib/types'
+import type { Draw, OfficialList, RifaResult } from '../lib/types'
 import DrawCard from './DrawCard.astro'
 
 interface Props {
   draws: Draw[]
+  winners: OfficialList[]
+  rifa: RifaResult | null
 }
 
-const { draws } = Astro.props
+const { draws, winners, rifa } = Astro.props
 ---
 
 {
   draws.length > 0 ? (
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-[clamp(14px,2vw,24px)] items-start">
       {draws.map((draw, i) => (
-        <div class="animate-fade-in" style={`animation-delay: ${i * 100}ms`}>
-          <DrawCard draw={draw} index={i} />
+        <div class="animate-card-in min-w-0" style={`animation-delay: ${i * 100}ms`}>
+          <DrawCard draw={draw} index={i} winners={winners.find((w) => w.drawNumber === draw.drawNumber)} rifa={rifa} />
         </div>
       ))}
     </div>
   ) : (
-    <div class="text-center py-20">
-      <p class="text-4xl mb-4">🏗️</p>
-      <p class="text-gray-400">No hay datos disponibles aún</p>
-      <p class="text-xs text-gray-600 mt-2">El scraper se ejecutará automáticamente en breve</p>
+    <div class="draw-card text-center py-16">
+      <p class="m-0 font-display font-extrabold text-xl text-royal">No hay datos disponibles aún</p>
+      <p class="mt-2 mb-0 text-sm text-ink-soft">El scraper se ejecutará automáticamente en breve</p>
     </div>
   )
 }

@@ -1,47 +1,126 @@
 ---
-import type { Draw } from '../lib/types'
+import type { Draw, OfficialList, RifaResult } from '../lib/types'
 import { formatDate, formatPrize } from '../lib/formatters'
+import { placeName } from '../lib/markdown'
 
 interface Props {
   draw: Draw
   index: number
+  winners?: OfficialList
+  rifa: RifaResult | null
 }
 
-const { draw, index } = Astro.props
+const { draw, index, winners, rifa } = Astro.props
+
+// Rifa lookup ran successfully → each main prize is either sold (has a client) or not.
+const rifaReady = rifa !== null && !rifa.error
+const soldTo = (number: string, place: number) =>
+  rifa?.matches.find((m) => m.drawNumber === draw.drawNumber && m.number === number && m.category === placeName(place))
 ---
 
-<div class="group relative bg-gradient-to-br from-gray-900/90 to-gray-950/90 border border-gray-800/60 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:border-amber-500/40 hover:-translate-y-1">
-  <div class="flex items-center justify-between mb-4">
-    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-semibold tracking-wide">
-      <span class="w-1.5 h-1.5 rounded-full bg-amber-400" />
-      Sorteo #{draw.drawNumber}
+<article class="draw-card h-full">
+  <div class="flex items-center justify-between">
+    <span class="draw-chip">Sorteo {draw.drawNumber}</span>
+    <span class="text-xs font-extrabold tracking-[0.14em] uppercase text-cyan-ink">
+      {index === 0 ? 'Último' : index === 1 ? 'Anterior' : `#${index + 1}`}
     </span>
-    <span class="text-[10px] text-gray-600 font-mono">{index === 0 ? 'ÚLTIMO' : index === 1 ? 'ANTERIOR' : `#${index + 1}`}</span>
   </div>
 
-  <div class="text-center my-5">
-    <p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Billete Ganador</p>
-    <p class="font-mono text-3xl sm:text-4xl font-bold tracking-[0.2em] text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">
-      {draw.winnerNumber.split('').map(d => (
-        <span class="inline-block mx-0.5">{d}</span>
-      ))}
+  <p class="mt-4 mb-0 text-center section-label">Billete ganador</p>
+  <p class="draw-winner">{draw.winnerNumber}</p>
+
+  <dl class="m-0">
+    <div class="draw-meta">
+      <dt>Premio</dt>
+      <dd>{formatPrize(draw.prize)}</dd>
+    </div>
+    <div class="draw-meta">
+      <dt>Fecha</dt>
+      <dd>{formatDate(draw.date)}</dd>
+    </div>
+  </dl>
+
+  {winners ? (
+    <div class="mt-5">
+      <div class="flex items-center justify-between mb-2.5">
+        <h3 class="m-0 section-label">Premios principales</h3>
+        <a href={`/api/draws/${draw.drawNumber}/winners.md`} target="_blank" class="text-xs font-bold text-cyan-ink hover:text-royal transition-colors">
+          Ver Markdown →
+        </a>
+      </div>
+      <div class="overflow-x-auto -mx-1 px-1">
+      <table class="prize-table">
+        <thead>
+          <tr>
+            <th class="text-left">Premio</th>
+            <th class="text-left">Número</th>
+            <th class="text-right">Monto</th>
+            <th class="text-right pl-3">Sucursal</th>
+            <th class="text-center pl-3">Vendido</th>
+          </tr>
+        </thead>
+        <tbody>
+          {winners.mainPrizes.map((p, i) => {
+            const sale = soldTo(p.number, p.place)
+            const detailId = `sale-${draw.drawNumber}-${i}`
+            return (
+              <>
+                <tr class:list={{ 'is-sold': sale }}>
+                  <td class="prize-place">{placeName(p.place)}</td>
+                  <td class="prize-num">{p.number}</td>
+                  <td class="prize-amount">{formatPrize(p.prize)}</td>
+                  <td class="prize-branch">{p.branch ?? '—'}</td>
+                  <td class="prize-sold">
+                    {sale ? (
+                      <button type="button" class="sold-chip" data-sale-toggle={detailId} aria-expanded="false" aria-controls={detailId}>
+                        Sí
+                      </button>
+                    ) : (
+                      <span class="sold-no">{rifaReady ? 'No' : '—'}</span>
+                    )}
+                  </td>
+                </tr>
+                {sale && (
+                  <tr id={detailId} class="sale-detail" hidden>
+                    <td colspan="5">
+                      <dl>
+                        <dt>Cliente</dt>
+                        <dd>{sale.cliente}</dd>
+                        <dt>Nombre</dt>
+                        <dd class="font-bold">{sale.nombre ?? '—'}</dd>
+                        <dt>Dirección</dt>
+                        <dd>{sale.direccion ?? '—'}</dd>
+                        <dt>Factura</dt>
+                        <dd>{sale.factura ?? '—'}</dd>
+                      </dl>
+                    </td>
+                  </tr>
+                )}
+              </>
+            )
+          })}
+        </tbody>
+      </table>
+      </div>
+      {rifa?.error && <p class="mt-2.5 mb-0 text-xs font-semibold text-danger">No se pudo consultar quién compró los números: {rifa.error}</p>}
+      <p class="mt-2.5 mb-0 text-xs text-ink-soft">
+        + {winners.approximations.length} aproximaciones y {winners.otherPrizes.length} premios más en la lista oficial
+      </p>
+    </div>
+  ) : (
+    <p class="mt-5 mb-0 py-3 rounded-[14px] bg-mist text-sm text-ink-soft text-center">
+      Presiona «Forzar actualización» para cargar la lista oficial de ganadores
     </p>
-  </div>
+  )}
+</article>
 
-  <div class="space-y-2 text-sm">
-    <div class="flex justify-between items-center py-1.5 border-t border-gray-800/50">
-      <span class="text-gray-400">Premio</span>
-      <span class="font-semibold text-amber-400">{formatPrize(draw.prize)}</span>
-    </div>
-    <div class="flex justify-between items-center py-1.5 border-t border-gray-800/50">
-      <span class="text-gray-400">Fecha</span>
-      <span class="text-gray-300">{formatDate(draw.date)}</span>
-    </div>
-  </div>
-</div>
-
-<style>
-  .group:hover .winner-digits {
-    text-shadow: 0 0 12px rgba(52, 211, 153, 0.5);
-  }
-</style>
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-sale-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const detail = document.getElementById(btn.dataset.saleToggle!)
+      if (!detail) return
+      detail.hidden = !detail.hidden
+      btn.setAttribute('aria-expanded', String(!detail.hidden))
+    })
+  })
+</script>

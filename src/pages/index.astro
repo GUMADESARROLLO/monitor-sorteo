@@ -20,32 +20,26 @@ if (store.isEmpty()) {
 }
 
 const draws = store.getDraws()
+const winners = store.getWinners()
+const rifa = store.getRifa()
 const updatedAt = store.getUpdatedAt()
 ---
 
 <Layout>
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+  <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-[clamp(14px,2.4vh,24px)]">
     <div>
-      <h2 class="text-2xl font-bold tracking-tight">Resultados recientes</h2>
-      <p class="text-sm text-gray-400 mt-1">
+      <h2 class="m-0 font-display font-extrabold text-white text-[clamp(22px,3.2vh,30px)] leading-tight tracking-[-0.01em]">
+        Resultados recientes
+      </h2>
+      <p class="mt-1 mb-0 text-sm text-on-royal-soft">
         Últimos {draws.length > 0 ? draws.length : '—'} sorteos publicados
         {updatedAt
-          ? ` — ${new Date(updatedAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`
+          ? ` · ${new Date(updatedAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`
           : ''}
       </p>
     </div>
     <RefreshButton />
   </div>
 
-  <DrawList draws={draws} />
+  <DrawList draws={draws} winners={winners} rifa={rifa} />
 </Layout>
-
-<style>
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-fade-in {
-    animation: fade-in 0.4s ease-out both;
-  }
-</style>
