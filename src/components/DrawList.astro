@@ -1,14 +1,15 @@
 ---
-import type { Draw, OfficialList, RifaResult } from '../lib/types'
+import type { Draw, OfficialList, RifaResult, WinnerListStatus } from '../lib/types'
 import DrawCard from './DrawCard.astro'
 
 interface Props {
   draws: Draw[]
   winners: OfficialList[]
+  winnersStatus: Record<number, WinnerListStatus>
   rifa: RifaResult | null
 }
 
-const { draws, winners, rifa } = Astro.props
+const { draws, winners, winnersStatus, rifa } = Astro.props
 ---
 
 {
@@ -16,7 +17,13 @@ const { draws, winners, rifa } = Astro.props
     <div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-[clamp(14px,2vw,24px)] items-start">
       {draws.map((draw, i) => (
         <div class="animate-card-in min-w-0" style={`animation-delay: ${i * 100}ms`}>
-          <DrawCard draw={draw} index={i} winners={winners.find((w) => w.drawNumber === draw.drawNumber)} rifa={rifa} />
+          <DrawCard
+            draw={draw}
+            index={i}
+            winners={winners.find((w) => w.drawNumber === draw.drawNumber)}
+            listStatus={winnersStatus[draw.drawNumber] ?? null}
+            rifa={rifa}
+          />
         </div>
       ))}
     </div>

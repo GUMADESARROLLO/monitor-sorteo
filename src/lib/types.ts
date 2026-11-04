@@ -10,6 +10,14 @@ export interface DrawsResponse {
   draws: Draw[]
 }
 
+/** ok = parsed · not-published = the site has no PDF for the draw yet · failed = PDF exists but couldn't be downloaded/parsed */
+export type WinnerListStatus = 'ok' | 'not-published' | 'failed'
+
+export interface WinnerListsResult {
+  lists: OfficialList[]
+  status: Record<number, WinnerListStatus>
+}
+
 export interface RifaMatch {
   drawNumber: number
   number: string
@@ -29,6 +37,7 @@ export interface RifaResult {
 
 export interface RefreshResponse extends DrawsResponse {
   winners: OfficialList[]
+  winnersStatus: Record<number, WinnerListStatus>
   rifa: RifaResult
 }
 

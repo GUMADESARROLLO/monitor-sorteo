@@ -4,7 +4,7 @@ import { scrapeLastThreeDraws } from '../../lib/scraper'
 import { fetchWinnerLists } from '../../lib/officialList'
 import { findRifaMatches } from '../../lib/rifa'
 import { startMonitor } from '../../lib/monitor'
-import type { RefreshResponse, RifaResult } from '../../lib/types'
+import type { RefreshResponse, RifaResult, WinnerListsResult } from '../../lib/types'
 
 startMonitor()
 
@@ -15,8 +15,17 @@ export const GET: APIRoute = async () => {
     const draws = await scrapeLastThreeDraws()
     store.update(draws)
 
-    const winners = await fetchWinnerLists(draws.map((d) => d.drawNumber))
-    store.updateWinners(winners)
+    // If the PDF lookup itself fails (the site is often slow), the draws still update.
+    let result: WinnerListsResult
+    try {
+      result = await fetchWinnerLists(draws.map((d) => d.drawNumber))
+    } catch (err) {
+      console.error('[API] Official list lookup failed:', err instanceof Error ? err.message : err)
+      result = { lists: [], status: Object.fromEntries(draws.map((d) => [d.drawNumber, 'failed' as const])) }
+    }
+    store.updateWinners(result)
+    const winners = result.lists
+
     // A database failure shouldn't block the lottery results.
     let rifa: RifaResult
     try {
@@ -34,6 +43,7 @@ export const GET: APIRoute = async () => {
       updatedAt: store.getUpdatedAt()!,
       draws,
       winners,
+      winnersStatus: result.status,
       rifa,
     }
 

@@ -231,6 +231,15 @@
   .sale-detail dt { color: var(--color-ink-soft); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; align-self: center; }
   .sale-detail dd { margin: 0; color: var(--color-ink); font-weight: 600; }
 
+  /* ---------- Aviso de Lista Oficial pendiente ---------- */
+  .list-notice {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #e6f6fd;
+    box-shadow: inset 4px 0 0 var(--color-cyan);
+  }
+  .list-notice.is-error { background: #fdecee; box-shadow: inset 4px 0 0 var(--color-danger); }
+
   /* ---------- Pie ---------- */
   .foot-links li + li { border-left: 1px solid rgb(255 255 255 / 0.35); margin-left: 16px; padding-left: 16px; }
   @media (max-width: 520px) {

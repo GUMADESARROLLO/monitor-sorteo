@@ -1,8 +1,9 @@
-import type { Draw, OfficialList, RifaResult } from './types'
+import type { Draw, OfficialList, RifaResult, WinnerListStatus, WinnerListsResult } from './types'
 
 class DrawStore {
   private draws: Draw[] = []
   private winners: OfficialList[] = []
+  private winnersStatus: Record<number, WinnerListStatus> = {}
   private rifa: RifaResult | null = null
   private lastUpdated: Date | null = null
 
@@ -35,8 +36,18 @@ class DrawStore {
     this.lastUpdated = new Date()
   }
 
-  updateWinners(winners: OfficialList[]): void {
-    this.winners = winners
+  /** null until a refresh has looked for this draw's official list. */
+  getWinnersStatus(drawNumber: number): WinnerListStatus | null {
+    return this.winnersStatus[drawNumber] ?? null
+  }
+
+  getAllWinnersStatus(): Record<number, WinnerListStatus> {
+    return { ...this.winnersStatus }
+  }
+
+  updateWinners({ lists, status }: WinnerListsResult): void {
+    this.winners = lists
+    this.winnersStatus = status
   }
 
   getRifa(): RifaResult | null {

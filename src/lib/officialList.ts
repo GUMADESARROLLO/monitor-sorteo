@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { getDocumentProxy } from 'unpdf'
-import type { MainPrize, OfficialList, OfficialListRef, PrizeEntry } from './types'
+import type { MainPrize, OfficialList, OfficialListRef, PrizeEntry, WinnerListStatus, WinnerListsResult } from './types'
 
 const MEDIA_API = 'https://loterianacional.com.ni/wp-json/wp/v2/media'
 const USER_AGENT =
@@ -21,7 +21,7 @@ export async function findOfficialLists(drawNumbers: number[]): Promise<Official
 
   // Most recent uploads only: enough to cover the latest draws.
   const res = await axios.get<MediaItem[]>(MEDIA_API, {
-    timeout: 15_000,
+    timeout: 30_000,
     headers: { 'User-Agent': USER_AGENT },
     params: { search: 'Lista', mime_type: 'application/pdf', per_page: 30, orderby: 'date', order: 'desc', _fields: 'date,source_url' },
   })
@@ -41,15 +41,26 @@ export async function findOfficialLists(drawNumbers: number[]): Promise<Official
 }
 
 /** Downloads and parses the official lists of the given draws. A list that fails or isn't published yet is skipped. */
-export async function fetchWinnerLists(drawNumbers: number[]): Promise<OfficialList[]> {
+export async function fetchWinnerLists(drawNumbers: number[]): Promise<WinnerListsResult> {
   const refs = await findOfficialLists(drawNumbers)
   const results = await Promise.allSettled(refs.map((ref) => fetchOfficialList(ref)))
 
-  return results.flatMap((r, i) => {
-    if (r.status === 'fulfilled') return [r.value]
-    console.error(`[SCRAPER] Lista oficial ${refs[i].drawNumber} failed:`, r.reason instanceof Error ? r.reason.message : r.reason)
-    return []
+  const lists: OfficialList[] = []
+  const status: Record<number, WinnerListStatus> = {}
+  for (const n of drawNumbers) status[n] = 'not-published'
+
+  results.forEach((r, i) => {
+    const drawNumber = refs[i].drawNumber
+    if (r.status === 'fulfilled') {
+      lists.push(r.value)
+      status[drawNumber] = 'ok'
+    } else {
+      status[drawNumber] = 'failed'
+      console.error(`[SCRAPER] Lista oficial ${drawNumber} failed:`, r.reason instanceof Error ? r.reason.message : r.reason)
+    }
   })
+
+  return { lists, status }
 }
 
 interface TextItem {
@@ -64,7 +75,8 @@ const NUMBER = /^\d{5}$/
 const AMOUNT = /^(?:C\$\s?[\d,]+(?:\.\d{2})?|[\d,]+\.\d{2})$/
 const AMOUNT_MILLIONS = /^C\$\s?(\d+)\s+MILLONES$/i
 const BRANCH = /^[A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ .]+$/
-const PLACE_LABEL = /^(\d+)\s*(?:do|er|ro|to|mo|vo|no)\s+Premio$/i
+// "2do Premio", or just "4to" when the PDF splits the label over two lines (extraordinary draws)
+const PLACE_LABEL = /^(\d+)\s*(?:do|er|ro|to|mo|vo|no)(?:\s+Premio)?$/i
 const COLUMN_TOLERANCE = 45
 const LINE_TOLERANCE = 3
 const MAX_AMOUNT_GAP = 80

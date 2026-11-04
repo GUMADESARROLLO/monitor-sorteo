@@ -21,6 +21,7 @@ if (store.isEmpty()) {
 
 const draws = store.getDraws()
 const winners = store.getWinners()
+const winnersStatus = store.getAllWinnersStatus()
 const rifa = store.getRifa()
 const updatedAt = store.getUpdatedAt()
 ---
@@ -41,5 +42,5 @@ const updatedAt = store.getUpdatedAt()
     <RefreshButton />
   </div>
 
-  <DrawList draws={draws} winners={winners} rifa={rifa} />
+  <DrawList draws={draws} winners={winners} winnersStatus={winnersStatus} rifa={rifa} />
 </Layout>

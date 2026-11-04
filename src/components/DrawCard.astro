@@ -1,5 +1,5 @@
 ---
-import type { Draw, OfficialList, RifaResult } from '../lib/types'
+import type { Draw, OfficialList, RifaResult, WinnerListStatus } from '../lib/types'
 import { formatDate, formatPrize } from '../lib/formatters'
 import { placeName } from '../lib/markdown'
 
@@ -7,10 +7,11 @@ interface Props {
   draw: Draw
   index: number
   winners?: OfficialList
+  listStatus: WinnerListStatus | null
   rifa: RifaResult | null
 }
 
-const { draw, index, winners, rifa } = Astro.props
+const { draw, index, winners, listStatus, rifa } = Astro.props
 
 // Rifa lookup ran successfully → each main prize is either sold (has a client) or not.
 const rifaReady = rifa !== null && !rifa.error
@@ -105,6 +106,23 @@ const soldTo = (number: string, place: number) =>
       {rifa?.error && <p class="mt-2.5 mb-0 text-xs font-semibold text-danger">No se pudo consultar quién compró los números: {rifa.error}</p>}
       <p class="mt-2.5 mb-0 text-xs text-ink-soft">
         + {winners.approximations.length} aproximaciones y {winners.otherPrizes.length} premios más en la lista oficial
+      </p>
+    </div>
+  ) : listStatus === 'not-published' ? (
+    <div class="list-notice mt-5">
+      <p class="m-0 font-bold text-ink">Lista Oficial aún no publicada</p>
+      <p class="mt-1 mb-0 text-sm text-ink-soft">
+        La Lotería Nacional todavía no ha subido el PDF con los ganadores de este sorteo. Vuelve a presionar «Forzar actualización» más tarde.
+      </p>
+      <a href="https://loterianacional.com.ni/sorteo/" target="_blank" class="inline-block mt-2 text-xs font-bold text-cyan-ink hover:text-royal transition-colors">
+        Ver en loterianacional.com.ni →
+      </a>
+    </div>
+  ) : listStatus === 'failed' ? (
+    <div class="list-notice is-error mt-5">
+      <p class="m-0 font-bold text-danger">No se pudo descargar la Lista Oficial</p>
+      <p class="mt-1 mb-0 text-sm text-ink-soft">
+        El sitio de la Lotería Nacional no respondió a tiempo. Intenta de nuevo con «Forzar actualización».
       </p>
     </div>
   ) : (
