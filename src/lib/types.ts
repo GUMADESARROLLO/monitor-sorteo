@@ -27,6 +27,14 @@ export interface RifaMatch {
   nombre: string | null
   direccion: string | null
   factura: string | null
+  /** TOTAL_FACTURA from Softland.umk.FACTURA, in córdobas */
+  montoFactura: number | null
+  /** Invoices of this client that earned raffle numbers during the promotion */
+  facturasCliente: number
+  /** Sum of those invoices' TOTAL_FACTURA, in córdobas */
+  montoCliente: number
+  /** Raffle numbers (acciones) the client accumulated */
+  accionesCliente: number
 }
 
 export interface RifaResult {

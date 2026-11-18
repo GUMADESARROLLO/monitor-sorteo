@@ -1,6 +1,6 @@
 ---
 import type { Draw, OfficialList, RifaResult, WinnerListStatus } from '../lib/types'
-import { formatDate, formatPrize } from '../lib/formatters'
+import { formatAmount, formatDate, formatPrize } from '../lib/formatters'
 import { placeName } from '../lib/markdown'
 
 interface Props {
@@ -93,6 +93,14 @@ const soldTo = (number: string, place: number) =>
                         <dd>{sale.direccion ?? '—'}</dd>
                         <dt>Factura</dt>
                         <dd>{sale.factura ?? '—'}</dd>
+                        <dt>Monto</dt>
+                        <dd>{sale.montoFactura != null ? formatAmount(sale.montoFactura) : '—'}</dd>
+                        <dt>Facturas</dt>
+                        <dd>{sale.facturasCliente.toLocaleString('es-NI')} en la promoción</dd>
+                        <dt>Total compra</dt>
+                        <dd>{formatAmount(sale.montoCliente)}</dd>
+                        <dt>Acciones</dt>
+                        <dd>{sale.accionesCliente.toLocaleString('es-NI')} acumuladas</dd>
                       </dl>
                     </td>
                   </tr>

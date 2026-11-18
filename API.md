@@ -96,7 +96,7 @@ Devuelve la lista de ganadores (sacada de la Lista Oficial en PDF) que cargó el
 GET /api/rifa
 ```
 
-Resultado de la última búsqueda (hecha en `GET /api/refresh`): todos los números premiados de los últimos 3 sorteos que están asignados a un cliente en `PRODUCCION.dbo.NUMEROS_RIFA`, con nombre y dirección de `Softland.umk.CLIENTE`. Si un número ganó dos premios en el mismo sorteo aparece dos veces. Requiere las variables `DB_SQL_*` en `.env`.
+Resultado de la última búsqueda (hecha en `GET /api/refresh`): todos los números premiados de los últimos 3 sorteos que están asignados a un cliente en `PRODUCCION.dbo.NUMEROS_RIFA`, con nombre y dirección de `Softland.umk.CLIENTE` y el monto total de la factura (`TOTAL_FACTURA`, en córdobas) de `Softland.umk.FACTURA`. `facturasCliente`, `montoCliente` y `accionesCliente` son los acumulados del cliente en toda la promoción: facturas que generaron números de rifa, la suma de sus totales y la cantidad de números (acciones) obtenidos. Si un número ganó dos premios en el mismo sorteo aparece dos veces. Requiere las variables `DB_SQL_*` en `.env`.
 
 ```json
 {
@@ -110,7 +110,11 @@ Resultado de la última búsqueda (hecha en `GET /api/refresh`): todos los núme
       "cliente": "04957",
       "nombre": "...",
       "direccion": "...",
-      "factura": "00306202"
+      "factura": "00306202",
+      "montoFactura": 6914.6,
+      "facturasCliente": 3,
+      "montoCliente": 17883.13,
+      "accionesCliente": 10
     }
   ]
 }
